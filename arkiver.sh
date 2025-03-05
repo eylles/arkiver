@@ -64,6 +64,7 @@ archive_dispatcher () {
             cd "$directory" || die "Couldn't open dir: ${directory}"
         fi
         printf '%s: %s\n' "$myname" "extracting archive '${archive}' to '${directory}'"
+        archive="${workdir}/${archive}"
         case "$archive" in
             *.tar.bz2|*.tbz2)
                 tar xvjf "$archive"
