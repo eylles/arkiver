@@ -1,0 +1,20 @@
+.POSIX:
+PREFIX = ~/.local
+.PHONY: install uninstall
+NAME = arkiver
+
+$(NAME):
+	cp arkiver.sh $(NAME)
+
+install: $(NAME)
+	chmod 755 $(NAME)
+	mkdir -p ${DESTDIR}${PREFIX}/bin
+	cp -vf $(NAME) ${DESTDIR}${PREFIX}/bin
+	ln -sf $(NAME) ${DESTDIR}${PREFIX}/bin/ext
+	rm -f $(NAME)
+uninstall:
+	rm -vf ${DESTDIR}${PREFIX}/bin/$(NAME)
+	rm -vf ${DESTDIR}${PREFIX}/bin/ext
+clean:
+	rm -vrf $(NAME)
+
