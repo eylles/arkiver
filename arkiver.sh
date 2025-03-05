@@ -1,10 +1,9 @@
 #!/bin/sh
 
-# A general, all-purpose extraction script. Not all extraction programs here
-# are installed by LARBS automatically.
-#
-# Default behavior: Extract archive into new directory
-# Behavior with `-c` option: Extract contents into current directory
+#########################################################################
+# A general, all-purpose extraction script to wrap over many utilities  #
+# to handle as many archive types as possible from a single executable. #
+#########################################################################
 
 myname="${0##*/}"
 
