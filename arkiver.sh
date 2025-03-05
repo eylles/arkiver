@@ -21,6 +21,11 @@ die() {
 }
 
 # return type: string
+get_header_comment () {
+    sed -n 's/^# /    / ; s/ #$// ; /^#####/,/^#####/p' "$0" | sed '1d;$d'
+}
+
+# return type: string
 #       usage: show_usage [code] [message]
 #        code: int, if provided will exit the script with the code
 #     message: string to display at exit as "prog_name: message"
@@ -44,6 +49,8 @@ show_help () {
     if [ -n "$1" ]; then
         code="$1"
     fi
+    printf '%s\n' "$myname"
+    get_header_comment
     show_usage 
     printf '%s\n' "Options:"
     printf '    %s\n' "-c: Extract archive into current directory rather than a new one."
