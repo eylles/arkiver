@@ -58,73 +58,79 @@ show_help () {
     exit "$code"
 }
 
+# return type: string
+#       usage: archive_extractor archive
+archive_extractor () {
+    archive="$1"
+    if [ -z "$extracthere" ]; then
+        directory="$(echo "$archive" | sed 's/\.[^\/.]*$//')"
+        mkdir -p "$directory"
+        cd "$directory" || die "Couldn't open dir: ${directory}"
+    fi
+    printf '%s: %s\n' "$myname" "extracting archive '${archive}' to '${directory}'"
+    archive="${workdir}/${archive}"
+    case "$archive" in
+        *.tar.bz2|*.tbz2)
+            tar xvjf "$archive"
+            ;;
+        *.tar.xz)
+            tar -xf "$archive"
+            ;;
+        *.tar.gz|*.tgz)
+            tar xvzf "$archive"
+            ;;
+        *.lzma)
+            unlzma "$archive"
+            ;;
+        *.bz2)
+            bunzip2 "$archive"
+            ;;
+        *.rar)
+            unrar x -p"$pass" "$archive"
+            ;;
+        *.gz)
+            gunzip "$archive"
+            ;;
+        *.tar)
+            tar xvf "$archive"
+            ;;
+        *.zip)
+            7z x -p"$pass" "$archive"
+            ;;
+        *.Z)
+            uncompress "$archive"
+            ;;
+        *.7z)
+            7z x -p"$pass" "$archive"
+            ;;
+        *.xz)
+            unxz "$archive"
+            ;;
+        *.exe)
+            cabextract "$archive"
+            ;;
+        *.deb)
+            ar x "$archive"
+            ;;
+        *.zst)
+            tar --zstd -xvf "$archive"
+            ;;
+        *) 
+            unar -p "$pass" "$archive"
+            ;;
+    esac
+    printf '\n'
+    if [ -z "$extracthere" ]; then
+        cd "$workdir" || die "Coudln't open dir: ${workdir}"
+    fi
+}
 
 # return type: string
 #       usage: archive_dispatcher archive
 archive_dispatcher () {
     archive="$1"
     if [ -f "$archive" ] ; then
-        if [ -z "$extracthere" ]; then
-            directory="$(echo "$archive" | sed 's/\.[^\/.]*$//')"
-            mkdir -p "$directory"
-            cd "$directory" || die "Couldn't open dir: ${directory}"
-        fi
-        printf '%s: %s\n' "$myname" "extracting archive '${archive}' to '${directory}'"
-        archive="${workdir}/${archive}"
-        case "$archive" in
-            *.tar.bz2|*.tbz2)
-                tar xvjf "$archive"
-                ;;
-            *.tar.xz)
-                tar -xf "$archive"
-                ;;
-            *.tar.gz|*.tgz)
-                tar xvzf "$archive"
-                ;;
-            *.lzma)
-                unlzma "$archive"
-                ;;
-            *.bz2)
-                bunzip2 "$archive"
-                ;;
-            *.rar)
-                unrar x -p"$pass" "$archive"
-                ;;
-            *.gz)
-                gunzip "$archive"
-                ;;
-            *.tar)
-                tar xvf "$archive"
-                ;;
-            *.zip)
-                7z x -p"$pass" "$archive"
-                ;;
-            *.Z)
-                uncompress "$archive"
-                ;;
-            *.7z)
-                7z x -p"$pass" "$archive"
-                ;;
-            *.xz)
-                unxz "$archive"
-                ;;
-            *.exe)
-                cabextract "$archive"
-                ;;
-            *.deb)
-                ar x "$archive"
-                ;;
-            *.zst)
-                tar --zstd -xvf "$archive"
-                ;;
-            *) 
-                unar -p "$pass" "$archive"
-                ;;
-        esac
-        printf '\n'
-        if [ -z "$extracthere" ]; then
-            cd "$workdir" || die "Coudln't open dir: ${workdir}"
-        fi
+        archive_extractor "$archive"
     else
         printf '%s: %s\n' "$myname" "archive '${archive}' doesn't exist!"
     fi
