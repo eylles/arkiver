@@ -125,6 +125,51 @@ archive_extractor () {
     fi
 }
 
+archive_lister () {
+    archive="$1"
+    case "$archive" in
+        *.tar.bz2|*.tbz2)
+            tar -tjf "$archive"
+            ;;
+        *.tar.xz)
+            tar -tJf "$archive"
+            ;;
+        *.tar.gz|*.tgz)
+            tar -tzf "$archive"
+            ;;
+        *.lzma)
+            xz --list "$archive"
+            ;;
+        *.rar)
+            unrar v -p"$pass" "$archive"
+            ;;
+        *.tar)
+            tar tf "$archive"
+            ;;
+        *.zip)
+            7z l -p"$pass" "$archive"
+            ;;
+        *.7z)
+            7z l -p"$pass" "$archive"
+            ;;
+        *.xz)
+            xz --list "$archive"
+            ;;
+        *.exe|*.cab)
+            cabextract -l "$archive"
+            ;;
+        *.deb)
+            ar t "$archive"
+            ;;
+        *.zst)
+            tar --zstd -tvf "$archive"
+            ;;
+        *) 
+            lsar -p "$pass" "$archive"
+            ;;
+    esac
+}
+
 # return type: string
 #       usage: archive_dispatcher archive
 archive_dispatcher () {
