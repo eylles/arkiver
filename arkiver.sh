@@ -106,7 +106,7 @@ archive_extractor () {
         *.xz)
             unxz "$archive"
             ;;
-        *.exe)
+        *.exe|*.cab)
             cabextract "$archive"
             ;;
         *.deb)
