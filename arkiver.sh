@@ -13,6 +13,16 @@ workdir="$PWD"
 extracthere=""
 # archive password
 pass=""
+# action to take on archives
+# possible values:
+#     arkext ex ext arkls arls ls lst list
+action=""
+
+case "$myname" in
+    arkext|ext|arkls|arls)
+        action="$myname"
+        ;;
+esac
 
 # usage: die "message"
 die() {
@@ -175,7 +185,17 @@ archive_lister () {
 archive_dispatcher () {
     archive="$1"
     if [ -f "$archive" ] ; then
-        archive_extractor "$archive"
+        case "$action" in
+            ex|ext|arkext)
+                archive_extractor "$archive"
+            ;;
+            ls|lst|list|arkls|arls)
+                archive_lister "$archive"
+            ;;
+            *)
+                printf '%s: %s\n' "$myname" "no action specified for $archive"
+            ;;
+        esac
     else
         printf '%s: %s\n' "$myname" "archive '${archive}' doesn't exist!"
     fi
@@ -200,6 +220,17 @@ while [ "$#" -gt 0 ]; do
             shift
             show_help 0
             ;;
+        ex|ext|list|lst|ls)
+            case "$myname" in
+                arkext|ext|arkls|arls)
+                    : # do nothing
+                ;;
+                *)
+                    action="$1"
+                ;;
+            esac
+            shift
+        ;;
         *)
             archive_dispatcher "$1"
             shift
