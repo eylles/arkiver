@@ -1,8 +1,9 @@
 #!/bin/sh
 
 #########################################################################
-# A general, all-purpose extraction script to wrap over many utilities  #
-# to handle as many archive types as possible from a single executable. #
+# A general, all-purpose wrapper script over many utilities to extract  #
+# and list the contents of as many archive types as possible from a     #
+# single executable.                                                    #
 #########################################################################
 
 myname="${0##*/}"
