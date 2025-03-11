@@ -45,7 +45,14 @@ show_usage () {
         printf '%s: %s\n' "$myname" "$2"
     fi
     printf '%s:\n' "Usage"
-    printf '    %s\n' "${myname}: [OPTION] <archives>"
+    case "$myname" in
+        arkext|ext|arkls|arls)
+            printf '    %s\n' "${myname}: [OPTION] <archives>"
+        ;;
+        *)
+            printf '    %s\n' "${myname}: [action] [OPTION] <archives>"
+        ;;
+    esac
     if [ -n "$1" ]; then
         exit "$1"
     fi
@@ -63,9 +70,30 @@ show_help () {
     printf '%s\n' "$myname"
     get_header_comment
     show_usage 
+    case "$myname" in
+        arkext|ext|arkls|arls)
+            : # do nothing
+            ;;
+        *)
+            printf '%s\n' "Actions:"
+            printf '    %s    %s\n' "ext" "extract archive"
+            printf '    %s    %s\n' "lst" "list archive contents"
+            ;;
+    esac
     printf '%s\n' "Options:"
-    printf '    %s\n' "-c: Extract archive into current directory rather than a new one."
-    printf '    %s\n' "-p: password."
+    case "$myname" in
+        arkext|ext|arkiver*)
+            printf '    %s\t\t\t%s\n' \
+                "-c" \
+                "Extract archive into current directory."
+            ;;
+        *)
+            : # do nothing
+            ;;
+    esac
+    printf '    %s\t%s\n' \
+        "-p <password>" "not every archive type supports passwords."
+    printf '    %s\t\t\t%s\n' "-h" "show this help message."
     exit "$code"
 }
 
@@ -217,7 +245,7 @@ while [ "$#" -gt 0 ]; do
             pass="$1"
             shift
             ;;
-        h|-h|--help)
+        h|-h|help|--help)
             shift
             show_help 0
             ;;
