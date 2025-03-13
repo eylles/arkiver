@@ -180,16 +180,19 @@ archive_lister () {
             xz --list "$archive"
             ;;
         *.rar)
-            unrar v -p"$pass" "$archive"
+            # prefer lsar output
+            lsar -p "$pass" "$archive" | tail -n +2
             ;;
         *.tar)
             tar tf "$archive"
             ;;
         *.zip)
-            7z l -p"$pass" "$archive"
+            # prefer lsar output
+            lsar -p "$pass" "$archive" | tail -n +2
             ;;
         *.7z)
-            7z l -p"$pass" "$archive"
+            # prefer lsar output
+            lsar -p "$pass" "$archive" | tail -n +2
             ;;
         *.xz)
             xz --list "$archive"
@@ -204,7 +207,7 @@ archive_lister () {
             tar --zstd -tvf "$archive"
             ;;
         *) 
-            lsar -p "$pass" "$archive"
+            lsar -p "$pass" "$archive" | tail -n +2
             ;;
     esac
 }
