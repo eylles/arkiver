@@ -14,6 +14,12 @@ workdir="$PWD"
 extracthere=""
 # archive password
 pass=""
+# file containing passwords for archives in workdir
+pass_file=""
+if [ -e "${workdir}/.password" ]; then
+    # printf '%s: %s\n' "$myname" "password file found"
+    pass_file="${workdir}/.password"
+fi
 # action to take on archives
 # possible values:
 #     arkext ex ext arkls arls ls lst list
@@ -217,6 +223,14 @@ archive_lister () {
 archive_dispatcher () {
     archive="$1"
     if [ -f "$archive" ] ; then
+        if [ -z "$pass" ] && [ -n "$pass_file" ]; then
+            # search for password
+            pass=$(grep -F "$archive" "$pass_file" | awk -F":::" '{print $1}')
+            if [ -z "$pass" ]; then
+                # use master password
+                pass=$(awk -F":::" 'NR==1{print $1}' "$pass_file")
+            fi
+        fi
         case "$action" in
             ex|ext|arkext)
                 archive_extractor "$archive"
