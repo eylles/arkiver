@@ -100,6 +100,29 @@ show_help () {
     printf '    %s\t%s\n' \
         "-p <password>" "not every archive type supports passwords."
     printf '    %s\t\t\t%s\n' "-h" "show this help message."
+    printf '\n'
+    printf '    %s\n' \
+        "for convenience password files are supported, the password file is"
+    printf '    %s\n' \
+        "a simple text file with fields separated by ':::' triple colons"
+    printf '    %s\n' \
+        "the first line is always the master password for all archives in"
+    printf '    %s\n' \
+        "the current directory, it may be defined as:"
+    printf '        %s\n' \
+        "'password:::MASTER'"
+    printf '    %s\n' \
+        "however the suffix ':::MASTER' is not necessary and can be skipped"
+    printf '    %s\n' \
+        "all other passwords however are expected to be in the format of:"
+    printf '        %s\n' \
+        "'password:::\"file name\"'"
+    printf '    %s\n' \
+        "the password file itself is to be named as:"
+    printf '        %s\n' \
+        ".password"
+    printf '    %s\n' \
+        "so that it will be just another dot file under normal operation"
     exit "$code"
 }
 
