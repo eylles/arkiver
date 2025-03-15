@@ -253,6 +253,11 @@ archive_dispatcher () {
                 # use master password
                 pass=$(awk -F":::" 'NR==1{print $1}' "$pass_file")
             fi
+        elif [ -n "$pass" ] && [ -n "$pass_file" ]; then
+            if ! grep -q -F "${pass}:::\"${archive}\"" "$pass_file"; then
+                printf '%s\n' "${myname}: recording password to passwords file"
+                printf '%s:::"%s"\n' "$pass" "$archive" >> "$pass_file"
+            fi
         fi
         case "$action" in
             ex|ext|arkext)
