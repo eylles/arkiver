@@ -75,7 +75,7 @@ show_help () {
     fi
     printf '%s\n' "$myname"
     get_header_comment
-    show_usage 
+    show_usage
     case "$myname" in
         arkext|ext|arkls|arls)
             : # do nothing
@@ -135,7 +135,8 @@ archive_extractor () {
         mkdir -p "$directory"
         cd "$directory" || die "Couldn't open dir: ${directory}"
     fi
-    printf '%s: %s\n' "$myname" "extracting archive '${archive}' to '${directory}'"
+    printf '%s: %s\n' \
+        "$myname" "extracting archive '${archive}' to '${directory}'"
     archive="${workdir}/${archive}"
     case "$archive" in
         *.tar.bz2|*.tbz2)
@@ -183,7 +184,7 @@ archive_extractor () {
         *.zst)
             tar --zstd -xvf "$archive"
             ;;
-        *) 
+        *)
             unar -p "$pass" "$archive"
             ;;
     esac
@@ -235,7 +236,7 @@ archive_lister () {
         *.zst)
             tar --zstd -tvf "$archive"
             ;;
-        *) 
+        *)
             lsar -p "$pass" "$archive" | tail -n +2
             ;;
     esac
