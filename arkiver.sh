@@ -122,7 +122,9 @@ show_help () {
     printf '        %s\n' \
         ".password"
     printf '    %s\n' \
-        "so that it will be just another dot file under normal operation"
+        "so that it will be just another dot file under normal operation."
+    printf '    %s\n' \
+        "$myname will add new passwords to existing password files."
     exit "$code"
 }
 
