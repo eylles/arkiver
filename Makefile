@@ -12,7 +12,6 @@ install: $(NAME)
 	cp -vf $(NAME) ${DESTDIR}${PREFIX}/bin
 	ln -sf $(NAME) ${DESTDIR}${PREFIX}/bin/ext
 	ln -sf $(NAME) ${DESTDIR}${PREFIX}/bin/arls
-	rm -f $(NAME)
 uninstall:
 	rm -vf ${DESTDIR}${PREFIX}/bin/$(NAME)
 	rm -vf ${DESTDIR}${PREFIX}/bin/ext
