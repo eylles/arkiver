@@ -244,24 +244,31 @@ archive_lister () {
     esac
 }
 
+# return type: void
+#       usage: arkpass_manage archive
+# description: fetch and record archive password from/to pass_file
+arkpass_manage () {
+    if [ -z "$pass" ] && [ -n "$pass_file" ]; then
+        # search for password
+        pass=$(grep -F "$1" "$pass_file" | awk -F":::" '{print $1}')
+        if [ -z "$pass" ]; then
+            # use master password
+            pass=$(awk -F":::" 'NR==1{print $1}' "$pass_file")
+        fi
+    elif [ -n "$pass" ] && [ -n "$pass_file" ]; then
+        if ! grep -q -F "${pass}:::\"${1}\"" "$pass_file"; then
+            printf '%s\n' "${myname}: recording password to passwords file"
+            printf '%s:::"%s"\n' "$pass" "$1" >> "$pass_file"
+        fi
+    fi
+}
+
 # return type: string
 #       usage: archive_dispatcher archive
 archive_dispatcher () {
     archive="$1"
     if [ -f "$archive" ] ; then
-        if [ -z "$pass" ] && [ -n "$pass_file" ]; then
-            # search for password
-            pass=$(grep -F "$archive" "$pass_file" | awk -F":::" '{print $1}')
-            if [ -z "$pass" ]; then
-                # use master password
-                pass=$(awk -F":::" 'NR==1{print $1}' "$pass_file")
-            fi
-        elif [ -n "$pass" ] && [ -n "$pass_file" ]; then
-            if ! grep -q -F "${pass}:::\"${archive}\"" "$pass_file"; then
-                printf '%s\n' "${myname}: recording password to passwords file"
-                printf '%s:::"%s"\n' "$pass" "$archive" >> "$pass_file"
-            fi
-        fi
+        arkpass_manage "$archive"
         case "$action" in
             ex|ext|arkext)
                 archive_extractor "$archive"
