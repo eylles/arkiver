@@ -29,6 +29,7 @@ action=""
 act_cmd=""
 # arguments and flags for the command
 cmd_arg=""
+pass_arg=""
 
 case "$myname" in
     arkext|ext|arkls|arls)
@@ -159,7 +160,7 @@ get_extractor () {
         *.rar)
             act_cmd="unrar"
             cmd_arg="x"
-            [ -n "$pass" ] && cmd_arg="${cmd_arg} -p$pass"
+            [ -n "$pass" ] && pass_arg="-p"
             ;;
         *.gz)
             act_cmd="gunzip"
@@ -172,7 +173,7 @@ get_extractor () {
         *.7z|*.zip)
             act_cmd="7z"
             cmd_arg="x"
-            [ -n "$pass" ] && cmd_arg="${cmd_arg} -p$pass"
+            [ -n "$pass" ] && pass_arg="-p"
             ;;
         *.Z)
             act_cmd="uncompress"
@@ -197,7 +198,7 @@ get_extractor () {
         *)
             act_cmd="unar"
             cmd_arg=""
-            [ -n "$pass" ] && cmd_arg="${cmd_arg} -p $pass"
+            [ -n "$pass" ] && pass_arg="-p "
             ;;
     esac
 }
@@ -215,9 +216,11 @@ archive_extractor () {
         "$myname" "extracting archive '${archive}' to '${directory}'"
     archive="${workdir}/${archive}"
     get_extractor "$archive"
-    # the unquoted expansion of cmd_arg is intentional
-    # shellcheck disable=SC2086
-    $act_cmd $cmd_arg "$archive"
+    if [ -n "$pass_arg" ]; then
+        $act_cmd "$cmd_arg" "$pass_arg""$pass" "$archive"
+    else
+        $act_cmd "$cmd_arg" "$archive"
+    fi
     printf '\n'
     if [ -z "$extracthere" ]; then
         cd "$workdir" || die "Coudln't open dir: ${workdir}"
