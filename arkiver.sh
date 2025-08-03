@@ -25,6 +25,11 @@ fi
 #     arkext ex ext arkls arls ls lst list
 action=""
 
+# command for performing the action
+act_cmd=""
+# arguments and flags for the command
+cmd_arg=""
+
 case "$myname" in
     arkext|ext|arkls|arls)
         action="$myname"
@@ -128,6 +133,75 @@ show_help () {
     exit "$code"
 }
 
+get_extractor () {
+    archive="$1"
+    case "$archive" in
+        *.tar.bz2|*.tbz2)
+            act_cmd="tar"
+            cmd_arg="xvjf"
+            ;;
+        *.tar.xz)
+            act_cmd="tar"
+            cmd_arg="-xf"
+            ;;
+        *.tar.gz|*.tgz)
+            act_cmd="tar"
+            cmd_arg="xvzf"
+            ;;
+        *.lzma)
+            act_cmd="unlzma"
+            cmd_arg=""
+            ;;
+        *.bz2)
+            act_cmd="bunzip2"
+            cmd_arg=""
+            ;;
+        *.rar)
+            act_cmd="unrar"
+            cmd_arg="x"
+            [ -n "$pass" ] && cmd_arg="${cmd_arg} -p$pass"
+            ;;
+        *.gz)
+            act_cmd="gunzip"
+            cmd_arg=""
+            ;;
+        *.tar)
+            act_cmd="tar"
+            cmd_arg="xvf"
+            ;;
+        *.7z|*.zip)
+            act_cmd="7z"
+            cmd_arg="x"
+            [ -n "$pass" ] && cmd_arg="${cmd_arg} -p$pass"
+            ;;
+        *.Z)
+            act_cmd="uncompress"
+            cmd_arg=""
+            ;;
+        *.xz)
+            act_cmd="unxz"
+            cmd_arg=""
+            ;;
+        *.exe|*.cab)
+            act_cmd="cabextract"
+            cmd_arg=""
+            ;;
+        *.deb)
+            act_cmd="ar"
+            cmd_arg="x"
+            ;;
+        *.zst)
+            act_cmd="tar"
+            cmd_arg="--zstd -xvf"
+            ;;
+        *)
+            act_cmd="unar"
+            cmd_arg=""
+            [ -n "$pass" ] && cmd_arg="${cmd_arg} -p $pass"
+            ;;
+    esac
+}
+
 # return type: string
 #       usage: archive_extractor archive
 archive_extractor () {
@@ -140,56 +214,10 @@ archive_extractor () {
     printf '%s: %s\n' \
         "$myname" "extracting archive '${archive}' to '${directory}'"
     archive="${workdir}/${archive}"
-    case "$archive" in
-        *.tar.bz2|*.tbz2)
-            tar xvjf "$archive"
-            ;;
-        *.tar.xz)
-            tar -xf "$archive"
-            ;;
-        *.tar.gz|*.tgz)
-            tar xvzf "$archive"
-            ;;
-        *.lzma)
-            unlzma "$archive"
-            ;;
-        *.bz2)
-            bunzip2 "$archive"
-            ;;
-        *.rar)
-            unrar x -p"$pass" "$archive"
-            ;;
-        *.gz)
-            gunzip "$archive"
-            ;;
-        *.tar)
-            tar xvf "$archive"
-            ;;
-        *.zip)
-            7z x -p"$pass" "$archive"
-            ;;
-        *.Z)
-            uncompress "$archive"
-            ;;
-        *.7z)
-            7z x -p"$pass" "$archive"
-            ;;
-        *.xz)
-            unxz "$archive"
-            ;;
-        *.exe|*.cab)
-            cabextract "$archive"
-            ;;
-        *.deb)
-            ar x "$archive"
-            ;;
-        *.zst)
-            tar --zstd -xvf "$archive"
-            ;;
-        *)
-            unar -p "$pass" "$archive"
-            ;;
-    esac
+    get_extractor "$archive"
+    # the unquoted expansion of cmd_arg is intentional
+    # shellcheck disable=SC2086
+    $act_cmd $cmd_arg "$archive"
     printf '\n'
     if [ -z "$extracthere" ]; then
         cd "$workdir" || die "Coudln't open dir: ${workdir}"
