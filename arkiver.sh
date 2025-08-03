@@ -246,11 +246,7 @@ archive_lister () {
         *.tar)
             tar tf "$archive"
             ;;
-        *.zip)
-            # prefer lsar output
-            lsar -p "$pass" "$archive" | tail -n +2
-            ;;
-        *.7z)
+        *.7z|*.zip)
             # prefer lsar output
             lsar -p "$pass" "$archive" | tail -n +2
             ;;
