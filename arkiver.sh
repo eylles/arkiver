@@ -416,12 +416,8 @@ archive_extractor () {
     printf '%s: %s\n' \
         "$myname" "extracting archive '${archive}' to '${directory}'"
     archive="${workdir}/${archive}"
-    get_extractor "$archive"
-    if [ -n "$pass_arg" ]; then
-        $act_cmd "$cmd_arg" "$pass_arg""$pass" "$archive"
-    else
-        $act_cmd "$cmd_arg" "$archive"
-    fi
+    get_command "$archive" "ext"
+    command_handler
     printf '\n'
     if [ -z "$extracthere" ]; then
         cd "$workdir" || die "Coudln't open dir: ${workdir}"
@@ -430,46 +426,12 @@ archive_extractor () {
 
 archive_lister () {
     archive="$1"
-    case "$archive" in
-        *.tar.bz2|*.tbz2)
-            tar -tjf "$archive"
-            ;;
-        *.tar.xz)
-            tar -tJf "$archive"
-            ;;
-        *.tar.gz|*.tgz)
-            tar -tzf "$archive"
-            ;;
-        *.lzma)
-            xz --list "$archive"
-            ;;
-        *.rar)
-            # prefer lsar output
-            lsar -p "$pass" "$archive" | tail -n +2
-            ;;
-        *.tar)
-            tar tf "$archive"
-            ;;
-        *.7z|*.zip)
-            # prefer lsar output
-            lsar -p "$pass" "$archive" | tail -n +2
-            ;;
-        *.xz)
-            xz --list "$archive"
-            ;;
-        *.exe|*.cab)
-            cabextract -l "$archive"
-            ;;
-        *.deb)
-            ar t "$archive"
-            ;;
-        *.zst)
-            tar --zstd -tvf "$archive"
-            ;;
-        *)
-            lsar -p "$pass" "$archive" | tail -n +2
-            ;;
-    esac
+    get_command "$archive" "lst"
+    if [ -z "$act_spec" ]; then
+        command_handler
+    else
+        command_handler | tail -n +2
+    fi
 }
 
 # return type: void
