@@ -29,7 +29,10 @@ action=""
 act_cmd=""
 # arguments and flags for the command
 cmd_arg=""
+# password argument
 pass_arg=""
+# action specific handling
+act_spec=""
 
 case "$myname" in
     arkext|ext|arkls|arls)
@@ -134,73 +137,271 @@ show_help () {
     exit "$code"
 }
 
-get_extractor () {
+get_command () {
     archive="$1"
+    act_hnd="$2"
+
     case "$archive" in
         *.tar.bz2|*.tbz2)
-            act_cmd="tar"
-            cmd_arg="xvjf"
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="tar"
+                    cmd_arg="xvjf"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+                "lst")
+                    act_cmd="tar"
+                    cmd_arg="-tjf"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+            esac
             ;;
         *.tar.xz)
-            act_cmd="tar"
-            cmd_arg="-xf"
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="tar"
+                    cmd_arg="-xf"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+                "lst")
+                    act_cmd="tar"
+                    cmd_arg="-tJf"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+            esac
             ;;
         *.tar.gz|*.tgz)
-            act_cmd="tar"
-            cmd_arg="xvzf"
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="tar"
+                    cmd_arg="xvzf"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+                "lst")
+                    act_cmd="tar"
+                    cmd_arg="-tzf"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+            esac
             ;;
         *.lzma)
-            act_cmd="unlzma"
-            cmd_arg=""
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="unlzma"
+                    cmd_arg=""
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+                "lst")
+                    act_cmd="xz"
+                    cmd_arg="--list"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+            esac
             ;;
         *.bz2)
-            act_cmd="bunzip2"
-            cmd_arg=""
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="bunzip2"
+                    cmd_arg=""
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+                "lst")
+                    act_cmd="lsar"
+                    cmd_arg=""
+                    act_spec="lsar"
+                    pass_arg=""
+                    [ -n "$pass" ] && pass_arg="-p "
+                    ;;
+            esac
             ;;
         *.rar)
-            act_cmd="unrar"
-            cmd_arg="x"
-            [ -n "$pass" ] && pass_arg="-p"
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="unrar"
+                    cmd_arg="x"
+                    act_spec=""
+                    pass_arg=""
+                    [ -n "$pass" ] && pass_arg="-p"
+                    ;;
+                "lst")
+                    # prefer lsar output
+                    act_cmd="lsar"
+                    cmd_arg=
+                    act_spec="lsar"
+                    pass_arg=""
+                    [ -n "$pass" ] && pass_arg="-p "
+                    ;;
+            esac
             ;;
         *.gz)
-            act_cmd="gunzip"
-            cmd_arg=""
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="gunzip"
+                    cmd_arg=""
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+                "lst")
+                    act_cmd="lsar"
+                    cmd_arg=""
+                    act_spec="lsar"
+                    pass_arg=""
+                    [ -n "$pass" ] && pass_arg="-p "
+                    ;;
+            esac
             ;;
         *.tar)
-            act_cmd="tar"
-            cmd_arg="xvf"
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="tar"
+                    cmd_arg="xvf"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+                "lst")
+                    act_cmd="tar"
+                    cmd_arg="tf"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+            esac
             ;;
         *.7z|*.zip)
-            act_cmd="7z"
-            cmd_arg="x"
-            [ -n "$pass" ] && pass_arg="-p"
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="7z"
+                    cmd_arg="x"
+                    act_spec=""
+                    pass_arg=""
+                    [ -n "$pass" ] && pass_arg="-p"
+                    ;;
+                "lst")
+                    # prefer lsar output
+                    act_cmd="lsar"
+                    cmd_arg=""
+                    act_spec="lsar"
+                    pass_arg=""
+                    [ -n "$pass" ] && pass_arg="-p "
+                    ;;
+            esac
             ;;
         *.Z)
-            act_cmd="uncompress"
-            cmd_arg=""
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="uncompress"
+                    cmd_arg=""
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+                "lst")
+                    act_cmd="lsar"
+                    cmd_arg=""
+                    act_spec="lsar"
+                    pass_arg=""
+                    [ -n "$pass" ] && pass_arg="-p "
+                    ;;
+            esac
             ;;
         *.xz)
-            act_cmd="unxz"
-            cmd_arg=""
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="unxz"
+                    cmd_arg=""
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+                "lst")
+                    act_cmd="xz"
+                    cmd_arg="--list"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+            esac
             ;;
         *.exe|*.cab)
-            act_cmd="cabextract"
-            cmd_arg=""
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="cabextract"
+                    cmd_arg=""
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+                "lst")
+                    act_cmd="cabextract"
+                    cmd_arg="-l"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+            esac
             ;;
         *.deb)
-            act_cmd="ar"
-            cmd_arg="x"
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="ar"
+                    cmd_arg="x"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+                "lst")
+                    act_cmd="ar"
+                    cmd_arg="t"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+            esac
             ;;
         *.zst)
-            act_cmd="tar"
-            cmd_arg="--zstd -xvf"
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="tar"
+                    cmd_arg="--zstd -xvf"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+                "lst")
+                    act_cmd="tar"
+                    cmd_arg="--zstd -tvf"
+                    act_spec=""
+                    pass_arg=""
+                    ;;
+            esac
             ;;
         *)
-            act_cmd="unar"
-            cmd_arg=""
-            [ -n "$pass" ] && pass_arg="-p "
+            case "$act_hnd" in
+                "ext")
+                    act_cmd="unar"
+                    cmd_arg=""
+                    act_spec=""
+                    pass_arg=""
+                    [ -n "$pass" ] && pass_arg="-p "
+                    ;;
+                "lst")
+                    act_cmd="lsar"
+                    cmd_arg=""
+                    act_spec="lsar"
+                    pass_arg=""
+                    [ -n "$pass" ] && pass_arg="-p "
+                    ;;
+            esac
             ;;
     esac
+}
+
+command_handler () {
+    if [ -n "$pass_arg" ]; then
+        $act_cmd "$cmd_arg" "$pass_arg""$pass" "$archive"
+    else
+        $act_cmd "$cmd_arg" "$archive"
+    fi
 }
 
 # return type: string
