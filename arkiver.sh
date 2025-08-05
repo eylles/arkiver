@@ -227,7 +227,6 @@ get_command () {
                     cmd_arg=""
                     act_spec="lsar"
                     pass_arg=""
-                    [ -n "$pass" ] && pass_arg="-p "
                     ;;
             esac
             ;;
@@ -263,7 +262,6 @@ get_command () {
                     cmd_arg=""
                     act_spec="lsar"
                     pass_arg=""
-                    [ -n "$pass" ] && pass_arg="-p "
                     ;;
             esac
             ;;
@@ -315,7 +313,6 @@ get_command () {
                     cmd_arg=""
                     act_spec="lsar"
                     pass_arg=""
-                    [ -n "$pass" ] && pass_arg="-p "
                     ;;
             esac
             ;;
@@ -411,10 +408,13 @@ get_command () {
 #              the command are set in the invocation scope by first running
 #              get_command "archive" "action" before running this function
 command_handler () {
+    # we do want the word splitting for the cmd_arg variable as it may
+    # contain space separated options.
+    # shellcheck disable=SC2086
     if [ -n "$pass_arg" ]; then
-        $act_cmd "$cmd_arg" "$pass_arg""$pass" "$archive"
+        $act_cmd $cmd_arg "$pass_arg""$pass" "$archive"
     else
-        $act_cmd "$cmd_arg" "$archive"
+        $act_cmd $cmd_arg "$archive"
     fi
 }
 
