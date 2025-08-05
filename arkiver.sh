@@ -137,6 +137,14 @@ show_help () {
     exit "$code"
 }
 
+# return type: void
+#       usage: get_command "archive" "action"
+# description: does not return any output, it sets scope variables before
+#              the invocation of command_handler, sets the following vars:
+#                  act_cmd
+#                  cmd_arg
+#                  act_spec
+#                  pass_arg
 get_command () {
     archive="$1"
     act_hnd="$2"
@@ -396,6 +404,12 @@ get_command () {
     esac
 }
 
+# return type: string
+#       usage: command_handler
+# description: handling of action command for the archive, no arguments
+#              are passed to this function, the variables to construct
+#              the command are set in the invocation scope by first running
+#              get_command "archive" "action" before running this function
 command_handler () {
     if [ -n "$pass_arg" ]; then
         $act_cmd "$cmd_arg" "$pass_arg""$pass" "$archive"
@@ -406,6 +420,8 @@ command_handler () {
 
 # return type: string
 #       usage: archive_extractor archive
+# description: extract archive, extraction in the current directory or a
+#              new one is controlled by the $extracthere variable
 archive_extractor () {
     archive="$1"
     if [ -z "$extracthere" ]; then
@@ -424,6 +440,10 @@ archive_extractor () {
     fi
 }
 
+# return type: string
+#       usage: archive_lister archive
+# description: return the list of files within the archive in a
+#              consistent format
 archive_lister () {
     archive="$1"
     get_command "$archive" "lst"
