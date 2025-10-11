@@ -17,17 +17,13 @@ debug_out() {
 }
 
 # dir from which the script was called
-workdir="$PWD"
+workdir=""
 # if the archive should be extracted in workdir
 extracthere=""
 # archive password
 pass=""
 # file containing passwords for archives in workdir
 pass_file=""
-if [ -e "${workdir}/.password" ]; then
-    # printf '%s: %s\n' "$myname" "password file found"
-    pass_file="${workdir}/.password"
-fi
 # action to take on archives
 # possible values:
 #     arkext ex ext arkls arls ls lst list
@@ -535,6 +531,14 @@ for arg in $arglist; do
     esac
 done
 unset arglist
+
+workdir="$PWD"
+debug_out "workdir: $workdir"
+
+if [ -e "${workdir}/.password" ]; then
+    pass_file="${workdir}/.password"
+    debug_out "pass_file: $pass_file"
+fi
 
 while [ "$#" -gt 0 ]; do
     case "$1" in
