@@ -8,6 +8,14 @@
 
 myname="${0##*/}"
 
+DBGOUT=""
+
+debug_out() {
+    if [ -n "$DBGOUT" ]; then
+        printf '%s\n' "$1"
+    fi
+}
+
 # dir from which the script was called
 workdir="$PWD"
 # if the archive should be extracted in workdir
@@ -106,6 +114,9 @@ show_help () {
             : # do nothing
             ;;
     esac
+    printf '    %s\t\t\t%s\n' \
+        "-d" \
+        "Print out debug information."
     printf '    %s\t%s\n' \
         "-p <password>" "not every archive type supports passwords."
     printf '    %s\t\t\t%s\n' "-h" "show this help message."
@@ -412,8 +423,12 @@ command_handler () {
     # contain space separated options.
     # shellcheck disable=SC2086
     if [ -n "$pass_arg" ]; then
+        debug_out \
+            "command handler: '$act_cmd $cmd_arg ${pass_arg}${pass} $archive'"
         $act_cmd $cmd_arg "$pass_arg""$pass" "$archive"
     else
+        debug_out \
+            "command handler: '$act_cmd $cmd_arg ${pass_arg}${pass} $archive'"
         $act_cmd $cmd_arg "$archive"
     fi
 }
@@ -458,12 +473,21 @@ archive_lister () {
 #       usage: arkpass_manage archive
 # description: fetch and record archive password from/to pass_file
 arkpass_manage () {
+    if [ -n "$pass" ]; then
+        debug_out "pass: '${pass}'"
+    fi
     if [ -z "$pass" ] && [ -n "$pass_file" ]; then
         # search for password
         pass=$(grep -F "$1" "$pass_file" | awk -F":::" '{print $1}')
+        if [ -n "$pass" ]; then
+            debug_out "pass: '${pass}'"
+        fi
         if [ -z "$pass" ]; then
             # use master password
             pass=$(awk -F":::" 'NR==1{print $1}' "$pass_file")
+            if [ -n "$pass" ]; then
+                debug_out "pass: '${pass}'"
+            fi
         fi
     elif [ -n "$pass" ] && [ -n "$pass_file" ]; then
         if ! grep -q -F "${pass}:::\"${1}\"" "$pass_file"; then
@@ -478,7 +502,9 @@ arkpass_manage () {
 archive_dispatcher () {
     archive="$1"
     if [ -f "$archive" ] ; then
+        debug_out "archive: '$archive'"
         arkpass_manage "$archive"
+        debug_out "action: $action"
         case "$action" in
             ex|ext|arkext)
                 archive_extractor "$archive"
@@ -499,8 +525,22 @@ if [ "${#}" -eq 0 ]; then
     show_usage 1 "no arguments passed"
 fi
 
+arglist="$*"
+for arg in $arglist; do
+    case "$arg" in
+        debug|-d|--debug)
+            DBGOUT=1
+            debug_out "${myname}: debug output turned on"
+            ;;
+    esac
+done
+unset arglist
+
 while [ "$#" -gt 0 ]; do
     case "$1" in
+        debug|-d|--debug)
+            shift
+            ;;
         c|-c|--current-dir)
             shift
             extracthere="True"
