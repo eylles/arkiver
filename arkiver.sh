@@ -421,7 +421,7 @@ command_handler () {
     if [ -n "$pass_arg" ]; then
         debug_out \
             "command handler: '$act_cmd $cmd_arg ${pass_arg}${pass} $archive'"
-        $act_cmd $cmd_arg "$pass_arg""$pass" "$archive"
+        eval $act_cmd $cmd_arg $pass_arg"$pass" "'${archive}'"
     else
         debug_out \
             "command handler: '$act_cmd $cmd_arg ${pass_arg}${pass} $archive'"
